@@ -18,7 +18,13 @@
 package org.apache.rocketmq.spring.annotation;
 
 public enum MessageModel {
+	/**
+	 * 广播消费
+	 */
     BROADCASTING("BROADCASTING"),
+	/**
+	 * 集群消费
+	 */
     CLUSTERING("CLUSTERING");
 
     private final String modeCN;

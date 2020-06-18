@@ -20,5 +20,9 @@ package org.apache.rocketmq.spring.core;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.spring.support.RocketMQConsumerLifecycleListener;
 
+/**
+ * Push 模式的消费者
+ * 使用时，建议实现该接口
+ */
 public interface RocketMQPushConsumerLifecycleListener extends RocketMQConsumerLifecycleListener<DefaultMQPushConsumer> {
 }

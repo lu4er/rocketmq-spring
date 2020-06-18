@@ -25,6 +25,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 解析 @RocketMQTransactionListener 注解后，封装的对象
+ */
 class TransactionHandler {
     private String name;
     private String beanName;
@@ -74,6 +77,7 @@ class TransactionHandler {
     }
 
     public void setCheckExecutor(int corePoolSize, int maxPoolSize, long keepAliveTime, int blockingQueueSize) {
+		// 创建 ThreadPoolExecutor 对象
         this.checkExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize,
             keepAliveTime, TimeUnit.MILLISECONDS,
             new LinkedBlockingDeque<>(blockingQueueSize));

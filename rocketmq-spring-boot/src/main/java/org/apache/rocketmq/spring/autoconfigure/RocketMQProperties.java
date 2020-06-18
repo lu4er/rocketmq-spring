@@ -20,16 +20,24 @@ package org.apache.rocketmq.spring.autoconfigure;
 import org.apache.rocketmq.common.MixAll;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * RocketMQ客户端的Properties对象
+ */
 @SuppressWarnings("WeakerAccess")
 @ConfigurationProperties(prefix = "rocketmq")
 public class RocketMQProperties {
 
     /**
      * The name server for rocketMQ, formats: `host:port;host:port`.
+	 *
+	 * NameServer地址
      */
     private String nameServer;
 
-    private Producer producer;
+	/**
+	 * Producer配置
+	 */
+	private Producer producer;
 
     public String getNameServer() {
         return nameServer;

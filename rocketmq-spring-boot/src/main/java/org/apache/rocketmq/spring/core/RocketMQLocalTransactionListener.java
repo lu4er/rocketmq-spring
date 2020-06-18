@@ -18,8 +18,13 @@ package org.apache.rocketmq.spring.core;
 
 import org.springframework.messaging.Message;
 
+/**
+ * RocketMQ 本地事务监听器接口
+ */
 public interface RocketMQLocalTransactionListener {
+	// 执行本地事务
     RocketMQLocalTransactionState executeLocalTransaction(final Message msg, final Object arg);
 
+    // 检查本地事务状态
     RocketMQLocalTransactionState checkLocalTransaction(final Message msg);
 }

@@ -26,6 +26,11 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnMissingBean(ObjectMapper.class)
 class JacksonFallbackConfiguration {
 
+	/**
+	 * ObjectMapper 是 Jackson 提供的 JSON 序列化工具类。
+	 * 生产者发送消息时，将消息使用 Jackson 进行序列化。
+	 * 消费者拉取消息时，将消息使用 Jackson 进行反序列化。
+	 */
     @Bean
     public ObjectMapper rocketMQMessageObjectMapper() {
         return new ObjectMapper();

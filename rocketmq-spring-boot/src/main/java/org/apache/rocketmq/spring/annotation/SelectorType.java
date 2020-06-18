@@ -22,11 +22,15 @@ import org.apache.rocketmq.common.filter.ExpressionType;
 public enum SelectorType {
 
     /**
+	 * 标签
+	 *
      * @see ExpressionType#TAG
      */
     TAG,
 
     /**
+	 * SQL
+	 *
      * @see ExpressionType#SQL92
      */
     SQL92

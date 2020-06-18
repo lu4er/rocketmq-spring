@@ -27,6 +27,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 声明指定 Bean 是 RocketMQ 生产者的 RocketMQLocalTransactionListener
+ *
  * This annotation is used over a class which implements interface
  * org.apache.rocketmq.client.producer.TransactionListener. The class implements
  * two methods for process callback events after the txProducer sends a transactional message.
@@ -36,10 +38,12 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+// 默认带了 @Component 注解，所以只要添加到了类上，就会注册成 Spring Bean 对象
 @Component
 public @interface RocketMQTransactionListener {
 
     /**
+	 * 生产者分组
      * Declare the txProducerGroup that is used to relate callback event to the listener, rocketMQTemplate must send a
      * transactional message with the declared txProducerGroup.
      * <p>

@@ -43,18 +43,25 @@ import java.util.Objects;
 public class RocketMQUtil {
     private final static Logger log = LoggerFactory.getLogger(RocketMQUtil.class);
 
+	// 将 Spring Boot RocketMQ RocketMQLocalTransactionListener 监听器，转换成 RocketMQ TransactionListener 监听器
     public static TransactionListener convert(RocketMQLocalTransactionListener listener) {
         return new TransactionListener() {
             @Override
             public LocalTransactionState executeLocalTransaction(Message message, Object obj) {
+            	// 转换 RocketMQ Message 转换成 Spring Message 对象
+				// 回调 RocketMQLocalTransactionListener 监听器
                 RocketMQLocalTransactionState state = listener.executeLocalTransaction(convertToSpringMessage(message), obj);
+                // 转换 Spring Boot RocketMQ RocketMQLocalTransactionState 事务状态，成 RocketMQ  LocalTransactionState 事务状态
                 return convertLocalTransactionState(state);
             }
 
             @Override
             public LocalTransactionState checkLocalTransaction(MessageExt messageExt) {
+				// 转换 RocketMQ Message 转换成 Spring Message 对象
+				// 回调 RocketMQLocalTransactionListener 监听器
                 RocketMQLocalTransactionState state = listener.checkLocalTransaction(convertToSpringMessage(messageExt));
-                return convertLocalTransactionState(state);
+				// 转换 Spring Boot RocketMQ RocketMQLocalTransactionState 事务状态，成 RocketMQ  LocalTransactionState 事务状态
+				return convertLocalTransactionState(state);
             }
         };
     }
@@ -78,6 +85,7 @@ public class RocketMQUtil {
         return new MessagingException(e.getErrorMessage(), e);
     }
 
+	// checkLocalTransaction 调用
     public static org.springframework.messaging.Message convertToSpringMessage(
         org.apache.rocketmq.common.message.MessageExt message) {
         MessageBuilder messageBuilder =
@@ -111,6 +119,7 @@ public class RocketMQUtil {
         }
     }
 
+	// executeLocalTransaction 调用
     public static org.springframework.messaging.Message convertToSpringMessage(
         org.apache.rocketmq.common.message.Message message) {
         MessageBuilder messageBuilder =
@@ -127,6 +136,7 @@ public class RocketMQUtil {
     public static org.apache.rocketmq.common.message.Message convertToRocketMessage(
         ObjectMapper objectMapper, String charset,
         String destination, org.springframework.messaging.Message<?> message) {
+    	// // 生成消息的 bytes 数组
         Object payloadObj = message.getPayload();
         byte[] payloads;
 
@@ -136,6 +146,7 @@ public class RocketMQUtil {
             payloads = (byte[]) message.getPayload();
         } else {
             try {
+            	// 序列化
                 String jsonObj = objectMapper.writeValueAsString(payloadObj);
                 payloads = jsonObj.getBytes(Charset.forName(charset));
             } catch (Exception e) {
@@ -143,6 +154,7 @@ public class RocketMQUtil {
             }
         }
 
+        // 获得 topic、tag 属性
         String[] tempArr = destination.split(":", 2);
         String topic = tempArr[0];
         String tags = "";
@@ -150,15 +162,19 @@ public class RocketMQUtil {
             tags = tempArr[1];
         }
 
+		// 创建 Message 对象，传入上述变量到其构造方法
         org.apache.rocketmq.common.message.Message rocketMsg = new org.apache.rocketmq.common.message.Message(topic, tags, payloads);
 
+		// 如果 MessageHeaders 非空，逐个处理
         MessageHeaders headers = message.getHeaders();
         if (Objects.nonNull(headers) && !headers.isEmpty()) {
+			// 设置 KEYS 属性
             Object keys = headers.get(RocketMQHeaders.KEYS);
             if (!StringUtils.isEmpty(keys)) { // if headers has 'KEYS', set rocketMQ message key
                 rocketMsg.setKeys(keys.toString());
             }
 
+			// 设置 FLAG 属性
             Object flagObj = headers.getOrDefault("FLAG", "0");
             int flag = 0;
             try {
@@ -169,10 +185,12 @@ public class RocketMQUtil {
             }
             rocketMsg.setFlag(flag);
 
+			// 设置 WAIT 属性
             Object waitStoreMsgOkObj = headers.getOrDefault("WAIT_STORE_MSG_OK", "true");
             boolean waitStoreMsgOK = Boolean.TRUE.equals(waitStoreMsgOkObj);
             rocketMsg.setWaitStoreMsgOK(waitStoreMsgOK);
 
+			// 设置 USERS_ 属性
             headers.entrySet().stream()
                 .filter(entry -> !Objects.equals(entry.getKey(), "FLAG")
                     && !Objects.equals(entry.getKey(), "WAIT_STORE_MSG_OK")) // exclude "FLAG", "WAIT_STORE_MSG_OK"

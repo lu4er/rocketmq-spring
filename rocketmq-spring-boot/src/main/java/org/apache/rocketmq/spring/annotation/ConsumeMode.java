@@ -19,11 +19,15 @@ package org.apache.rocketmq.spring.annotation;
 
 public enum ConsumeMode {
     /**
+	 * 并发消费
+	 *
      * Receive asynchronously delivered messages concurrently
      */
     CONCURRENTLY,
 
     /**
+	 * 顺序消费
+	 *
      * Receive asynchronously delivered messages orderly. one queue, one thread
      */
     ORDERLY

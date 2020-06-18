@@ -23,6 +23,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 声明指定 Bean 是 RocketMQ 消费者的 MessageListener
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -33,6 +36,8 @@ public @interface RocketMQMessageListener {
     String TRACE_TOPIC_PLACEHOLDER = "${rocketmq.consumer.customized-trace-topic:}";
 
     /**
+	 * 消费分组
+	 *
      * Consumers of the same role is required to have exactly same subscriptions and consumerGroup to correctly achieve
      * load balance. It's required and needs to be globally unique.
      *
@@ -42,11 +47,15 @@ public @interface RocketMQMessageListener {
     String consumerGroup();
 
     /**
+	 * 消费主体
+	 *
      * Topic name.
      */
     String topic();
 
     /**
+	 * 选择消息的方式
+	 *
      * Control how to selector message.
      *
      * @see SelectorType
@@ -54,21 +63,29 @@ public @interface RocketMQMessageListener {
     SelectorType selectorType() default SelectorType.TAG;
 
     /**
+	 * 选择消息的表达式
+	 *
      * Control which message can be select. Grammar please see {@link SelectorType#TAG} and {@link SelectorType#SQL92}
      */
     String selectorExpression() default "*";
 
     /**
+	 * 消费模式
+	 *
      * Control consume mode, you can choice receive message concurrently or orderly.
      */
     ConsumeMode consumeMode() default ConsumeMode.CONCURRENTLY;
 
     /**
+	 * 消费模型
+	 *
      * Control message mode, if you want all subscribers receive message all message, broadcasting is a good choice.
      */
     MessageModel messageModel() default MessageModel.CLUSTERING;
 
     /**
+	 * 消费线程数
+	 *
      * Max consumer thread number.
      */
     int consumeThreadMax() default 64;

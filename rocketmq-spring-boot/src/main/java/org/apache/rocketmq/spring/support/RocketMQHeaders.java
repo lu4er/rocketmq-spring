@@ -17,6 +17,8 @@
 package org.apache.rocketmq.spring.support;
 
 /**
+ * RocketMQ Message Header 属性名的枚举
+ *
  * Represents the RocketMQ message protocol that is used during the data exchange.
  */
 public class RocketMQHeaders {

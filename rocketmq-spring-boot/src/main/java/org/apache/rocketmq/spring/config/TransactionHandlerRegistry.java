@@ -39,14 +39,16 @@ public class TransactionHandlerRegistry implements DisposableBean {
     }
 
     public void registerTransactionHandler(TransactionHandler handler) throws MQClientException {
+		// 不能声明重复的 TransactionHandler
         if (listenerContainers.contains(handler.getName())) {
             throw new MQClientException(-1,
                 String
                     .format("The transaction name [%s] has been defined in TransactionListener [%s]", handler.getName(),
                         handler.getBeanName()));
         }
+        // 不能声明重复的 TransactionHandler
         listenerContainers.add(handler.getName());
-
+		// 创建并启动 TransactionMQProducer
         rocketMQTemplate.createAndStartTransactionMQProducer(handler.getName(), handler.getListener(), handler.getCheckExecutor(), handler.getRpcHook());
     }
 }

@@ -41,24 +41,40 @@ import org.springframework.context.annotation.Role;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+/**
+ * RocketMQ 自动配置类
+ */
+// 配置类
 @Configuration
+// 指定RocketMQProperties自动配置
 @EnableConfigurationProperties(RocketMQProperties.class)
+// 要求有 MQAdmin、ObjectMapper 类
 @ConditionalOnClass({ MQAdmin.class, ObjectMapper.class })
+// 要求有 rocketmq 开头，且 name-server 的配置
 @ConditionalOnProperty(prefix = "rocketmq", value = "name-server")
+// 引入 JacksonFallbackConfiguration 和 ListenerContainerConfiguration 配置类
 @Import({ JacksonFallbackConfiguration.class, ListenerContainerConfiguration.class })
+// 在 JacksonAutoConfiguration 之后初始化
 @AutoConfigureAfter(JacksonAutoConfiguration.class)
 public class RocketMQAutoConfiguration {
 
+	/**
+	 * 创建 DefaultMQProducer Bean 对象
+	 */
     @Bean
+	// 不存在 DefaultMQProducer Bean 对象
     @ConditionalOnMissingBean(DefaultMQProducer.class)
+	// 要求有 rocketmq 开头，且 name-server、producer.group 的配置
     @ConditionalOnProperty(prefix = "rocketmq", value = {"name-server", "producer.group"})
     public DefaultMQProducer defaultMQProducer(RocketMQProperties rocketMQProperties) {
+    	//校验配置
         RocketMQProperties.Producer producerConfig = rocketMQProperties.getProducer();
         String nameServer = rocketMQProperties.getNameServer();
         String groupName = producerConfig.getGroup();
         Assert.hasText(nameServer, "[rocketmq.name-server] must not be null");
         Assert.hasText(groupName, "[rocketmq.producer.group] must not be null");
 
+        //创建DefaultMQProducer对象
         DefaultMQProducer producer;
         String ak = rocketMQProperties.getProducer().getAccessKey();
         String sk = rocketMQProperties.getProducer().getSecretKey();
@@ -72,6 +88,7 @@ public class RocketMQAutoConfiguration {
                 rocketMQProperties.getProducer().getCustomizedTraceTopic());
         }
 
+		// 将 RocketMQProperties.Producer 配置，设置到 producer 中
         producer.setNamesrvAddr(nameServer);
         producer.setSendMsgTimeout(producerConfig.getSendMessageTimeout());
         producer.setRetryTimesWhenSendFailed(producerConfig.getRetryTimesWhenSendFailed());
@@ -83,12 +100,20 @@ public class RocketMQAutoConfiguration {
         return producer;
     }
 
+	/**
+	 * 创建 RocketMQTemplate Bean 对象
+	 */
+	// 声明了销毁时，调用 destroy 方法
     @Bean(destroyMethod = "destroy")
+	// 有 DefaultMQProducer Bean 的情况下
     @ConditionalOnBean(DefaultMQProducer.class)
+	// 不存在 RocketMQTemplate Bean 对象
     @ConditionalOnMissingBean(RocketMQTemplate.class)
     public RocketMQTemplate rocketMQTemplate(DefaultMQProducer mqProducer, ObjectMapper rocketMQMessageObjectMapper) {
-        RocketMQTemplate rocketMQTemplate = new RocketMQTemplate();
-        rocketMQTemplate.setProducer(mqProducer);
+		// 创建 RocketMQTemplate 对象
+		RocketMQTemplate rocketMQTemplate = new RocketMQTemplate();
+		// 创建 RocketMQTemplate 对象
+		rocketMQTemplate.setProducer(mqProducer);
         rocketMQTemplate.setObjectMapper(rocketMQMessageObjectMapper);
         return rocketMQTemplate;
     }
@@ -100,6 +125,7 @@ public class RocketMQAutoConfiguration {
         return new TransactionHandlerRegistry(template);
     }
 
+	// 指定 Bean 的名字
     @Bean(name = RocketMQConfigUtils.ROCKETMQ_TRANSACTION_ANNOTATION_PROCESSOR_BEAN_NAME)
     @ConditionalOnBean(TransactionHandlerRegistry.class)
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)

@@ -18,7 +18,16 @@
 package org.apache.rocketmq.spring.core;
 
 public enum RocketMQLocalTransactionState {
+	/**
+	 * 已提交
+	 */
     COMMIT,
+	/**
+	 * 已回滚
+	 */
     ROLLBACK,
+	/**
+	 * 未知
+	 */
     UNKNOWN
 }
